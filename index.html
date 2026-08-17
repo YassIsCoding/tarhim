@@ -597,7 +597,7 @@
   function toPersian(n){
     return String(n).split('').map(d => persianDigits[d] !== undefined ? persianDigits[d] : d).join('');
   }
-  let count = 0;
+  let count = 1023;
   const countEl = document.getElementById('salavatCount');
   const unitEl = countEl.querySelector('.unit');
   const btn = document.getElementById('salavatBtn');
