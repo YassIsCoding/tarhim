@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>یادبود | کارت تسلیت دیجیتال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0908;
+    --ink-2:#141210;
+    --gold:#c9a24c;
+    --gold-bright:#e8c674;
+    --gold-dim:#8a6f34;
+    --paper:#f3ead9;
+    --paper-dim:#cfc3ac;
+    --glow: 0 0 24px rgba(232,198,116,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    height:100%;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Vazirmatn', sans-serif;
+    overflow:hidden;
+  }
+  body{
+    position:relative;
+    min-height:100vh;
+    min-height:100dvh;
+  }
+  .amiri{ font-family:'Aref Ruqaa', serif; }
+
+  /* ambient candle-glow background, present on both scenes */
+  .ambient{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(201,162,76,.14), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120,90,30,.10), transparent 65%),
+      var(--ink);
+    animation: flicker 6s ease-in-out infinite;
+  }
+  @keyframes flicker{
+    0%,100%{ filter:brightness(1); }
+    45%{ filter:brightness(1.06); }
+    60%{ filter:brightness(0.97); }
+  }
+
+  /* ============ SCENE 1 — ENVELOPE ============ */
+  #scene-envelope{
+    position:fixed; inset:0; z-index:5;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:28px;
+    padding:24px;
+    transition: opacity .9s ease, visibility .9s ease;
+  }
+  #scene-envelope.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+
+  .eyebrow{
+    letter-spacing:.35em;
+    font-size:11px;
+    color:var(--paper-dim);
+    text-transform:none;
+  }
+  .addressee-txt{
+  text-align:center;
+  color:var(--gold-bright);
+  font-weight:600;
+  font-size:clamp(15px, 4vw, 19px);
+  letter-spacing:.02em;
+  margin-bottom:-260px;
+}
+  .envelope-wrap{
+    width:min(90vw, 480px);
+    aspect-ratio: 16/10;
+    position:relative;
+    filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+    cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* envelope body: the flat rectangular front of the envelope */
+  .envelope-body{
+    position:absolute; inset:0;
+    border-radius:8px;
+    background:
+      radial-gradient(circle at 12% 20%, rgba(232,198,116,.55) 0, transparent .6%),
+      radial-gradient(circle at 78% 15%, rgba(232,198,116,.45) 0, transparent .6%),
+      radial-gradient(circle at 30% 70%, rgba(232,198,116,.4) 0, transparent .6%),
+      radial-gradient(circle at 60% 82%, rgba(232,198,116,.5) 0, transparent .6%),
+      radial-gradient(circle at 88% 60%, rgba(232,198,116,.35) 0, transparent .6%),
+      radial-gradient(circle at 45% 40%, rgba(232,198,116,.3) 0, transparent .6%),
+      radial-gradient(circle at 20% 90%, rgba(232,198,116,.4) 0, transparent .6%),
+      radial-gradient(circle at 65% 12%, rgba(232,198,116,.4) 0, transparent .6%),
+      linear-gradient(160deg, #17140f, #0c0a08 60%, #131009);
+    background-size: 3% 6%, 4% 5%, 3% 4%, 5% 6%, 4% 5%, 3% 4%, 4% 6%, 3% 5%, cover;
+    border:1px solid rgba(201,162,76,.5);
+    box-shadow: inset 0 0 40px rgba(0,0,0,.6);
+  }
+  /* subtle side fold seams, like a real envelope pocket */
+  .envelope-body::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(115deg, transparent 48%, rgba(232,198,116,.16) 50%, transparent 52%) bottom left / 55% 55% no-repeat,
+      linear-gradient(245deg, transparent 48%, rgba(232,198,116,.16) 50%, transparent 52%) bottom right / 55% 55% no-repeat;
+    border-radius:8px;
+  }
+  /* the open flap: gold triangle folded down from the top edge */
+  .envelope-flap{
+    position:absolute; top:0; left:0; right:0; height:66%;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: linear-gradient(165deg, var(--gold-bright), var(--gold) 55%, var(--gold-dim) 100%);
+    box-shadow: inset 0 -12px 24px rgba(0,0,0,.2);
+  }
+  .envelope-flap::after{
+    content:"";
+    position:absolute; inset:0;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: linear-gradient(165deg, rgba(255,255,255,.18), transparent 40%);
+  }
+  /* wax seal medallion sitting at the flap's tip */
+  .wax-seal{
+    position:absolute; left:50%; top:66%; width:64px; height:64px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 55%, var(--gold-dim) 100%);
+    box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 0 0 0 3px rgba(36,26,8,.25);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .wax-seal svg{ width:26px; height:26px; fill:#2a1f0c; }
+  .pulse-ring{
+    position:absolute; left:50%; top:66%; width:64px; height:64px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    border:1px solid rgba(232,198,116,.45);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:translate(-50%,-50%) scale(.7); opacity:.7; }
+    100%{ transform:translate(-50%,-50%) scale(2.3); opacity:0; }
+  }
+  .envelope-cta{
+    position:absolute; left:50%; top:86%; transform:translate(-50%,-50%);
+    text-align:center;
+    color:var(--gold-bright);
+    width:100%;
+  }
+  .envelope-cta .tap-txt{
+    font-weight:600;
+    font-size:clamp(13px, 3.4vw, 16px);
+    letter-spacing:.02em;
+  }
+  .envelope-cta .tap-sub{
+    font-size:11px;
+    margin-top:4px;
+    color:var(--paper-dim);
+    opacity:.85;
+  }
+
+  .verse{
+    text-align:center;
+    max-width:340px;
+  }
+  .verse .arabic{
+    font-family:'Aref Ruqaa', serif;
+    font-size:clamp(20px, 5vw, 26px);
+    color:var(--gold-bright);
+    line-height:1.9;
+  }
+
+  /* opening animation state */
+  .envelope-wrap.opening .envelope-flap{
+    animation: flap-lift .6s cubic-bezier(.6,0,.4,1) forwards;
+    transform-origin: 50% 0%;
+  }
+  @keyframes flap-lift{
+    to{ transform: rotateX(-140deg); opacity:.4; }
+  }
+  .envelope-wrap.opening .wax-seal,
+  .envelope-wrap.opening .pulse-ring,
+  .envelope-wrap.opening .envelope-cta{
+    opacity:0; transition:opacity .25s ease;
+  }
+  .envelope-wrap.opening .envelope-body{ animation: body-fade .7s ease .2s forwards; }
+  @keyframes body-fade{ to{ opacity:0; } }
+  .envelope-wrap{ perspective: 900px; }
+
+  /* ============ SCENE 2 — CARD ============ */
+  #scene-card{
+    position:fixed; inset:0; z-index:4;
+    display:flex; flex-direction:column;
+    opacity:0; visibility:hidden;
+    transition: opacity 1s ease .1s, visibility 1s ease .1s;
+  }
+  #scene-card.visible{ opacity:1; visibility:visible; }
+
+  .card-header{
+    flex:0 0 auto;
+    text-align:center;
+    padding: max(18px, env(safe-area-inset-top)) 16px 10px;
+    position:relative; z-index:2;
+  }
+  .card-header .basmalah{
+    font-family:'Aref Ruqaa', serif;
+    color:var(--gold-bright);
+    font-size:clamp(15px,4vw,19px);
+  }
+  .card-header .deceased-name{
+    margin-top:6px;
+    font-weight:600;
+    letter-spacing:.02em;
+    font-size:clamp(13px, 3.6vw, 16px);
+    color:var(--paper-dim);
+  }
+  .card-header .deceased-name b{
+    color:var(--gold-bright);
+    font-weight:600;
+  }
+
+  .video-stage{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:clamp(10px, 3vw, 32px);
+    position:relative; z-index:2;
+  }
+  .video-frame{
+    position:relative;
+    height:100%;
+    max-height:100%;
+    aspect-ratio: 1380 / 2440;
+    width:auto;
+    max-width:100%;
+    border-radius:14px;
+    padding:8px;
+    background: linear-gradient(160deg, rgba(201,162,76,.5), rgba(201,162,76,.08) 40%, rgba(201,162,76,.5));
+    box-shadow: 0 25px 60px rgba(0,0,0,.55);
+  }
+  .video-frame::before{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:14px;
+    border:1px solid rgba(232,198,116,.35);
+    pointer-events:none;
+  }
+  .video-inner{
+    position:relative;
+    width:100%; height:100%;
+    border-radius:9px;
+    overflow:hidden;
+    background:#000;
+  }
+  .video-inner video{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .corner{
+    display: none;
+  }
+  .corner.tl{ top:-6px; left:-6px; border-top:2px solid; border-right:2px solid; }
+  .corner.tr{ top:-6px; right:-6px; border-top:2px solid; border-left:2px solid; }
+  .corner.bl{ bottom:-6px; left:-6px; border-bottom:2px solid; border-right:2px solid; }
+  .corner.br{ bottom:-6px; right:-6px; border-bottom:2px solid; border-left:2px solid; }
+
+  .play-veil{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55));
+    cursor:pointer;
+    transition:opacity .4s ease, visibility .4s ease;
+  }
+  .play-veil.hidden{ opacity:0; visibility:hidden; }
+  .play-btn{
+    width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 70%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 26px rgba(0,0,0,.5), 0 0 0 6px rgba(232,198,116,.12);
+  }
+  .play-btn svg{ width:22px; height:22px; fill:#221a08; margin-right:-3px; }
+
+  .card-footer{
+    flex:0 0 auto;
+    display:flex; justify-content:center;
+    padding: 16px 16px max(18px, env(safe-area-inset-bottom));
+    position:relative; z-index:3;
+  }
+  .info-toggle{
+    background: linear-gradient(160deg, var(--ink-2), #0b0906);
+    border:1px solid var(--gold-dim);
+    color:var(--gold-bright);
+    font-family:'Vazirmatn', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:.02em;
+    padding:11px 26px;
+    border-radius:999px;
+    display:flex; align-items:center; gap:8px;
+    cursor:pointer;
+    box-shadow: 0 4px 18px rgba(0,0,0,.4);
+    transition: box-shadow .3s ease, transform .2s ease;
+  }
+  .info-toggle:active{ transform:scale(.97); }
+  .info-toggle svg{ width:15px; height:15px; }
+
+  /* ============ SHEET ============ */
+  #overlay{
+    position:fixed; inset:0; z-index:10;
+    background:rgba(6,5,4,.66);
+    backdrop-filter: blur(2px);
+    opacity:0; visibility:hidden;
+    transition: opacity .35s ease, visibility .35s ease;
+  }
+  #overlay.open{ opacity:1; visibility:visible; }
+
+  #sheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:11;
+    max-height:82vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background: linear-gradient(180deg, #15120d, #0b0907);
+    border-top:1px solid rgba(201,162,76,.4);
+    border-radius:22px 22px 0 0;
+    box-shadow: 0 -20px 50px rgba(0,0,0,.5);
+    padding: 14px 22px max(26px, env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform .45s cubic-bezier(.2,.8,.25,1);
+  }
+  #sheet.open{ transform: translateY(0); }
+
+  .sheet-handle{
+    width:38px; height:4px; border-radius:2px;
+    background:rgba(232,198,116,.35);
+    margin:0 auto 18px;
+  }
+  .sheet-close{
+    position:absolute; top:14px; left:16px;
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(232,198,116,.25);
+    color:var(--gold-bright);
+    font-size:15px; line-height:1; cursor:pointer;
+  }
+
+  .sheet-section{
+    padding:16px 0;
+    border-bottom:1px solid rgba(201,162,76,.14);
+  }
+  .sheet-section:last-child{ border-bottom:none; padding-bottom:4px; }
+  .sheet-section .label{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:12px; color:var(--gold-bright); font-weight:600;
+    margin-bottom:8px; letter-spacing:.02em;
+  }
+  .sheet-section .label svg{ width:15px; height:15px; flex:0 0 auto; }
+  .sheet-section p{
+    font-size:13.5px; line-height:2; color:var(--paper);
+  }
+  .sheet-section .muted{ color:var(--paper-dim); font-size:12.5px; }
+
+  /* row of round app logos (google maps / neshan / balad) under the address */
+  .map-links{
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    margin-top:14px;
+  }
+  .map-links a{ display:flex; flex-direction:column; align-items:center; gap:6px; text-decoration:none; }
+  .map-links .app-name{ font-size:10.5px; color:var(--paper-dim); }
+  .app-logo{
+    width:40px; height:40px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#fff;
+    padding:6px;
+    box-shadow:0 3px 10px rgba(0,0,0,.4);
+  }
+
+  .map-link{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    margin-top:10px;
+    font-size:12.5px;
+    color:var(--gold-bright);
+    text-decoration:none;
+    border-bottom:1px solid rgba(232,198,116,.4);
+    padding-bottom:2px;
+  }
+
+  /* salavat */
+  .salavat-box{
+    display:flex; flex-direction:column; align-items:center;
+    gap:14px;
+    padding-top:6px;
+  }
+  .salavat-count{
+    font-size:34px;
+    font-weight:700;
+    color:var(--gold-bright);
+    text-shadow: var(--glow);
+    font-variant-numeric: tabular-nums;
+    position:relative;
+  }
+  .salavat-count .unit{
+    font-size:12px; color:var(--paper-dim); font-weight:400; display:block; margin-top:2px;
+  }
+  .salavat-btn{
+    position:relative;
+    width:120px; height:120px; border-radius:50%;
+    border:none; cursor:pointer;
+    background: radial-gradient(circle at 32% 28%, var(--gold-bright), var(--gold) 55%, var(--gold-dim) 100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 8px rgba(232,198,116,.08);
+    color:#241a08;
+    font-family:'Vazirmatn', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .12s ease, box-shadow .3s ease;
+    overflow:visible;
+  }
+  .salavat-btn:active{ transform:scale(.94); }
+  .salavat-hint{
+    font-size:11.5px; color:var(--paper-dim);
+    text-align:center; max-width:220px;
+  }
+  .float-plus{
+    position:absolute;
+    left:50%; top:10%;
+    transform:translateX(-50%);
+    color:var(--gold-bright);
+    font-weight:700; font-size:14px;
+    pointer-events:none;
+    animation: floatUp .8s ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{ opacity:1; transform:translate(-50%,0); }
+    100%{ opacity:0; transform:translate(-50%,-38px); }
+  }
+
+  ::-webkit-scrollbar{ width:0; height:0; }
+
+  @media (max-width:520px){
+    .video-stage{ padding:8px; }
+  }
+  @media (max-height:640px){
+    .video-stage{ padding:6px; }
+    .card-header{ padding-top:max(10px, env(safe-area-inset-top)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- ===== SCENE 1: ENVELOPE ===== -->
+<section id="scene-envelope">
+   <div class="addressee-txt">خدمت خانم و آقا</div>
+
+  <div class="envelope-wrap" id="envelope" role="button" tabindex="0" aria-label="باز کردن کارت">
+    <div class="envelope-body"></div>
+    <div class="envelope-flap"></div>
+    <div class="pulse-ring"></div>
+    <div class="wax-seal">
+      <svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7L12 2zm0 2.2 7 3.8v5c0 3.9-3 6.7-7 7.2-4-.5-7-3.3-7-7.2V8l7-3.8z"/></svg>
+    </div>
+    <div class="envelope-cta">
+      <div class="tap-txt">اینجا کلیک کنید</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== SCENE 2: CARD ===== -->
+<section id="scene-card">
+  <header class="card-header">
+
+  </header>
+
+  <div class="video-stage">
+    <div class="video-frame">
+      <div class="video-inner" id="videoInner">
+        <span class="corner bl"></span><span class="corner br"></span>
+        <video id="memVideo" src="Tarhim.mp4" poster="poster.jpg" playsinline controls preload="auto"></video>
+        <div class="play-veil" id="playVeil">
+          <div class="play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="card-footer">
+    <button class="info-toggle" id="openSheet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+      اطلاعات مراسم
+    </button>
+  </footer>
+</section>
+
+<!-- ===== INFO SHEET ===== -->
+<div id="overlay"></div>
+<div id="sheet" role="dialog" aria-label="اطلاعات مراسم">
+  <div class="sheet-close" id="closeSheet">✕</div>
+  <div class="sheet-handle"></div>
+
+  <div class="sheet-section" style="text-align:center">
+    <div class="label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold-bright)" stroke-width="1.8"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      مکان مراسم
+    </div>
+    <p>محل برگزاری: تالار تشریفات بیناتس <br>آدرس: تهران، پیروزی، پل اول بلوار ابوذر، نبش کوچه هفتم شرقی </p>
+
+    <!--
+      ردیف لوگوهای گرد نقشه. هر <a> یک لینک جدا با href مخصوص همون اپ هست.
+      عکس‌های گوگل‌مپ / نشان / بلد رو خودتون کنار index.html بذارید و نام فایل
+      رو داخل src= همون‌جا که نوشته PUT-LOGO-HERE جایگزین کنید.
+      کلاس app-logo همون چیزیه که لوگو رو گرد و با پس‌زمینه‌ سفید نشون میده.
+    -->
+    <div class="map-links">
+      <a id="mapLink" href="https://maps.app.goo.gl/9mRHXmKXXrbaz3Gf8" target="_blank" rel="noopener">
+        <img class="app-logo" src="googlemaps.png" alt="گوگل‌مپ">
+        <span class="app-name">گوگل‌مپ</span>
+      </a>
+      <a id="neshanLink" href="https://nshn.ir/36_bvEz3pxpSHm" target="_blank" rel="noopener">
+        <img class="app-logo" src="neshan.png" alt="نشان">
+        <span class="app-name">نشان</span>
+      </a>
+      <a id="baladLink" href="https://balad.ir/p/1dn2Djobfuow6D" target="_blank" rel="noopener">
+        <img class="app-logo" src="balad.png" alt="بلد">
+        <span class="app-name">بلد</span>
+      </a>
+    </div>
+  </div>
+
+
+
+<script>
+(function(){
+  const envelope = document.getElementById('envelope');
+  const sceneEnvelope = document.getElementById('scene-envelope');
+  const sceneCard = document.getElementById('scene-card');
+
+  function openCard(){
+    if(envelope.classList.contains('opening')) return;
+    envelope.classList.add('opening');
+
+    // start playback (with sound) right inside this click — this is the
+    // "user gesture" browsers require to allow audio to play automatically
+    video.muted = false;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(()=>{ veil.classList.add('hidden'); })
+        .catch(()=>{ /* some browsers still blocked it — the play button stays visible as fallback */ });
+    }
+
+    setTimeout(()=>{
+      sceneEnvelope.classList.add('hidden');
+      sceneCard.classList.add('visible');
+    }, 550);
+  }
+  envelope.addEventListener('click', openCard);
+  envelope.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCard(); }
+  });
+
+  // video play veil
+  const video = document.getElementById('memVideo');
+  const veil = document.getElementById('playVeil');
+  veil.addEventListener('click', function(){
+    video.muted = false;
+    video.play();
+    veil.classList.add('hidden');
+  });
+  video.addEventListener('play', ()=> veil.classList.add('hidden'));
+  video.addEventListener('pause', ()=> { if(video.currentTime===0) veil.classList.remove('hidden'); });
+
+  // sheet
+  const overlay = document.getElementById('overlay');
+  const sheet = document.getElementById('sheet');
+  const openBtn = document.getElementById('openSheet');
+  const closeBtn = document.getElementById('closeSheet');
+
+  function openSheet(){
+    overlay.classList.add('open');
+    sheet.classList.add('open');
+  }
+  function closeSheetFn(){
+    overlay.classList.remove('open');
+    sheet.classList.remove('open');
+  }
+  openBtn.addEventListener('click', openSheet);
+  closeBtn.addEventListener('click', closeSheetFn);
+  overlay.addEventListener('click', closeSheetFn);
+
+  // salavat counter (in-memory, per session)
+  const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  function toPersian(n){
+    return String(n).split('').map(d => persianDigits[d] !== undefined ? persianDigits[d] : d).join('');
+  }
+  let count = 0;
+  const countEl = document.getElementById('salavatCount');
+  const unitEl = countEl.querySelector('.unit');
+  const btn = document.getElementById('salavatBtn');
+
+  function render(){
+    countEl.childNodes[0].nodeValue = toPersian(count);
+  }
+  render();
+
+  btn.addEventListener('click', function(){
+    count++;
+    render();
+    const plus = document.createElement('span');
+    plus.className = 'float-plus';
+    plus.textContent = '+۱';
+    plus.style.left = (45 + Math.random()*10) + '%';
+    btn.appendChild(plus);
+    setTimeout(()=> plus.remove(), 800);
+  });
+
+  // map links — replace the address text below with the real address once, used for all three
+  var venueAddress = 'تالار تشریفات بیناتس';
+  document.getElementById('mapLink').href = 'https://maps.google.com/?q=' + encodeURIComponent(venueAddress);
+  // Neshan and Balad app/web search links — adjust once you confirm their exact URL scheme
+
+})();
+</script>
+</body>
+</html>
